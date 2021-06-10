@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent, SyntheticEvent } from 'react'
 import './App.css'
+import useStore from './store/store'
 
 type ToDo = {
   toDo: string
@@ -7,7 +8,7 @@ type ToDo = {
 }
 
 function App(): JSX.Element {
-  const [toDos, setToDo] = useState<ToDo[]>([])
+  const { toDos, toggleToDo, addToDo, deleteToDo } = useStore((state) => state)
   const [input, setInput] = useState<string>('')
 
   return (
@@ -21,13 +22,13 @@ function App(): JSX.Element {
           <p className={toDo.isDone ? 'Done' : ''}>{toDo.toDo}</p>
           <div className="ToDo__Btn-wrapper">
             <button
-              onClick={() => handleToggleToDo(index)}
+              onClick={() => toggleToDo(index)}
               className="ToDo__Btn-delete"
             >
               ✔️
             </button>
             <button
-              onClick={() => handleDeleteToDo(index)}
+              onClick={() => deleteToDo(index)}
               className="ToDo__Btn-delete"
             >
               ❌
@@ -37,14 +38,6 @@ function App(): JSX.Element {
       ))}
     </div>
   )
-
-  function handleToggleToDo(index: number): void {
-    const foundToDo = toDos.find((_: ToDo, i: number): boolean => i === index)
-    if (foundToDo) {
-      foundToDo.isDone = !foundToDo.isDone
-      setToDo([...toDos.slice(0, index), foundToDo, ...toDos.slice(index + 1)])
-    }
-  }
 
   function handleOnChange(event: ChangeEvent<HTMLInputElement>): void {
     const input: string = event.target.value
@@ -58,16 +51,9 @@ function App(): JSX.Element {
         toDo: input,
         isDone: false,
       }
-      setToDo([...toDos, newToDo])
+      addToDo(newToDo)
       setInput('')
     }
-  }
-
-  function handleDeleteToDo(index: number): void {
-    const ToDosWithoutToDoFoundOnIndex: ToDo[] = toDos.filter(
-      (_: ToDo, i: number): boolean => i !== index
-    )
-    setToDo(ToDosWithoutToDoFoundOnIndex)
   }
 }
 
